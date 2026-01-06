@@ -1,0 +1,8 @@
+:root {
+  --primary: #2563eb;     /* blue-600 */
+  --primary-light: #dbeafe;
+  --sidebar-bg: #0f172a;  /* slate-900 */
+  --sidebar-hover: #1e293b;
+  --sidebar-text: #cbd5f5;
+  --sidebar-active: #2563eb;
+}
