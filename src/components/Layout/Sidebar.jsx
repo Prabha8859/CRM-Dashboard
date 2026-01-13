@@ -1,175 +1,170 @@
-import { useState } from "react";
-import { NavLink } from "react-router-dom";
-import {
-  LayoutDashboard,
-  Users,
-  ShieldCheck,
-  ChevronLeft,
-  ChevronRight,
-} from "lucide-react";
+import React, { useState } from 'react';
+import { LayoutDashboard, Users, Settings, PieChart, LogOut, X, Box, ChevronLeft, ChevronRight, User } from 'lucide-react';
 
-const menuItems = [
-  {
-    name: "Dashboard",
-    path: "/",
-    icon: LayoutDashboard,
-  },
-  {
-    name: "Staff",
-    path: "/staff",
-    icon: Users,
-  },
-  {
-    name: "Insurance",
-    path: "/insurance",
-    icon: ShieldCheck,
-  },
-];
+const Sidebar = ({ isDarkMode, isOpen, toggleSidebar, currentPage, onNavigate }) => {
+  const [isCollapsed, setIsCollapsed] = useState(false);
+  // Enhanced Theme Configuration
+  const theme = {
+    bg: isDarkMode 
+      ? "bg-slate-900/95 backdrop-blur-2xl border-r border-white/5" 
+      : "bg-white/90 backdrop-blur-2xl border-r border-slate-200",
+    text: isDarkMode ? "text-slate-400" : "text-slate-500",
+    textActive: isDarkMode ? "text-white" : "text-blue-600",
+    hover: isDarkMode ? "hover:bg-white/5 hover:text-slate-200" : "hover:bg-slate-50 hover:text-slate-700",
+    active: isDarkMode 
+      ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/20" 
+      : "bg-gradient-to-r from-blue-50 to-indigo-50 text-blue-700 shadow-sm border border-blue-100",
+    iconActive: isDarkMode ? "text-white" : "text-blue-600",
+    iconInactive: isDarkMode ? "text-slate-500 group-hover:text-slate-300" : "text-slate-400 group-hover:text-slate-600",
+    tooltip: isDarkMode ? "bg-slate-800 text-white border-slate-700" : "bg-slate-900 text-white border-slate-800"
+  };
 
-export default function Sidebar() {
-  const [collapsed, setCollapsed] = useState(false);
-  const [hoveredItem, setHoveredItem] = useState(null);
+  const menuItems = [
+    { icon: LayoutDashboard, label: 'Dashboard' },
+    { icon: PieChart, label: 'Analytics' },
+    { icon: Users, label: 'Customers' },
+    { icon: Settings, label: 'Settings' },
+  ];
+
+  const toggleCollapse = () => setIsCollapsed(!isCollapsed);
 
   return (
-    <aside
-      className={`h-screen sticky top-0 left-0 z-40 transition-all duration-300 shadow-2xl ${
-        collapsed ? "w-16" : "w-64"
-      }`}
-      style={{
-        backgroundColor: "var(--sidebar-bg)",
-        color: "var(--sidebar-text)",
-      }}
-    >
-      {/* LOGO */}
-      <div className="flex items-center justify-between p-4 border-b border-slate-700 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-blue-500/5 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-500" />
-        
-        {!collapsed && (
-          <h1 className="text-lg font-bold text-white relative z-10 tracking-wide">
-            CRM Admin
-          </h1>
-        )}
-        
-        <button
-          onClick={() => setCollapsed(!collapsed)}
-          className="text-slate-400 hover:text-white transition-all duration-300 transform hover:scale-110 hover:rotate-180 relative z-10 p-1 rounded-full hover:bg-slate-700/50"
-        >
-          {collapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
-        </button>
-      </div>
+    <>
+      {/* Mobile Overlay */}
+      {isOpen && (
+        <div 
+          className="fixed inset-0 bg-black/60 z-40 md:hidden backdrop-blur-sm transition-opacity duration-300"
+          onClick={toggleSidebar}
+        />
+      )}
 
-      {/* MENU */}
-      <nav className="mt-6 space-y-2 px-3">
-        {menuItems.map((item, index) => {
-          const Icon = item.icon;
-          const isHovered = hoveredItem === index;
+      <aside className={`
+        fixed md:relative z-50 
+        ${isCollapsed ? 'w-20' : 'w-72'} min-h-screen flex flex-col 
+        transition-all duration-300 ease-in-out
+        ${theme.bg}
+        ${isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
+      `}>
+        {/* Header / Logo */}
+        <div className={`p-6 flex items-center justify-between`}>
+          <div className="flex items-center gap-3 px-2">
+            <div className={`
+              w-10 h-10 rounded-xl flex items-center justify-center shadow-lg
+              bg-gradient-to-br from-blue-500 to-indigo-600
+            `}>
+              <Box className="text-white" size={24} />
+            </div>
+            {!isCollapsed && (
+              <div className="animate-in fade-in duration-300">
+                <h1 className={`text-lg font-bold tracking-tight ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
+                  CRM Admin
+                </h1>
+                <p className={`text-xs font-medium ${isDarkMode ? 'text-slate-500' : 'text-slate-400'}`}>
+                  v2.0.0
+                </p>
+              </div>
+            )}
+          </div>
+           {/* Collapse Toggle Button (Desktop Only) - Moved to Header */}
+           <button 
+            onClick={toggleCollapse}
+            className={`
+              hidden md:flex p-2 rounded-lg transition-all duration-200
+              ${theme.hover} ${theme.text}
+            `}
+          >
+            {isCollapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
+          </button>
 
-          return (
-            <NavLink
-              key={index}
-              to={item.path}
-              onMouseEnter={() => setHoveredItem(index)}
-              onMouseLeave={() => setHoveredItem(null)}
-              className={({ isActive }) => `relative flex items-center gap-3 px-3 py-3 rounded-lg cursor-pointer transition-all duration-300 group ${
-                isActive
-                  ? "text-white shadow-lg"
-                  : "hover:translate-x-1"
-              }`}
-              style={({ isActive }) => ({
-                backgroundColor: isActive
-                  ? "var(--sidebar-active)"
-                  : isHovered
-                  ? "var(--sidebar-hover)"
-                  : "transparent",
-              })}
-            >
-              {({ isActive }) => (
-                <>
-                  {/* Active indicator bar */}
-                  {isActive && (
-                    <div
-                      className="absolute left-0 top-0 bottom-0 w-1 rounded-r-full"
-                      style={{ backgroundColor: "#60a5fa" }}
-                    />
-                  )}
+          {/* Mobile Close Button */}
+          <button 
+            onClick={toggleSidebar} 
+            className={`md:hidden p-2 rounded-lg transition-colors ${theme.hover}`}
+          >
+            <X size={20} />
+          </button>
+        </div>
 
-                  {/* Hover glow effect */}
-                  {isHovered && !isActive && (
-                    <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-transparent rounded-lg animate-pulse" />
-                  )}
+        {/* Navigation */}
+        <div className="flex-1 px-4 py-6 space-y-2 overflow-y-auto custom-scrollbar">
+          {!isCollapsed && (
+            <p className={`px-4 text-xs font-bold uppercase tracking-wider mb-4 ${isDarkMode ? 'text-slate-600' : 'text-slate-400'} animate-in fade-in duration-300`}>
+              Main Menu
+            </p>
+          )}
+          {menuItems.map((item, index) => {
+            const isActive = currentPage === item.label;
+            return (
+              <button
+                key={index}
+                onClick={() => onNavigate && onNavigate(item.label)}
+                className={`
+                  w-full flex items-center ${isCollapsed ? 'justify-center px-2' : 'gap-3 px-4'} py-3.5 rounded-xl 
+                  transition-all duration-200 group relative overflow-hidden
+                  ${isActive ? theme.active : `${theme.text} ${theme.hover}`}
+                `}
+              >
+                <item.icon 
+                  size={22} 
+                  className={`
+                    transition-colors duration-200
+                    ${isActive ? theme.iconActive : theme.iconInactive}
+                  `} 
+                />
+                {!isCollapsed && <span className="font-medium relative z-10 animate-in fade-in duration-200">{item.label}</span>}
+                
+                {/* Active Indicator for non-active hover state */}
+                {!isActive && (
+                  <div className={`
+                    absolute left-0 top-0 bottom-0 w-1 bg-blue-500 rounded-r-full 
+                    opacity-0 group-hover:opacity-100 transition-opacity duration-200
+                  `} />
+                )}
 
-                  {/* Icon with animation */}
-                  <div
-                    className={`relative z-10 transition-all duration-300 ${
-                      isActive
-                        ? "scale-110"
-                        : isHovered
-                        ? "scale-105 rotate-6"
-                        : ""
-                    }`}
-                  >
-                    <Icon size={20} />
+                {/* Tooltip for collapsed state */}
+                {isCollapsed && (
+                  <div className={`
+                    absolute left-full ml-4 px-3 py-1.5 rounded-lg text-sm font-medium shadow-xl
+                    opacity-0 group-hover:opacity-100 transition-all duration-200 translate-x-2 group-hover:translate-x-0
+                    pointer-events-none z-50 whitespace-nowrap border
+                    ${theme.tooltip}
+                  `}>
+                    {item.label}
+                    {/* Arrow */}
+                    <div className={`absolute top-1/2 -left-1 w-2 h-2 -mt-1 rotate-45 border-l border-b ${theme.tooltip} border-r-0 border-t-0 bg-inherit`}></div>
                   </div>
+                )}
+              </button>
+            );
+          })}
+        </div>
 
-                  {/* Text with slide effect */}
-                  {!collapsed && (
-                    <span
-                      className={`text-sm font-medium relative z-10 transition-all duration-300 ${
-                        isActive ? "font-semibold" : ""
-                      }`}
-                    >
-                      {item.name}
-                    </span>
-                  )}
-
-                  {/* Ripple effect on click */}
-                  {isActive && (
-                    <div className="absolute inset-0 rounded-lg overflow-hidden">
-                      <div className="absolute inset-0 bg-white/10 animate-ping opacity-20" />
-                    </div>
-                  )}
-
-                  {/* Tooltip for collapsed state */}
-                  {collapsed && isHovered && (
-                    <div 
-                      className="absolute left-full ml-2 px-3 py-1 text-white text-sm rounded-md shadow-lg whitespace-nowrap z-50"
-                      style={{
-                        backgroundColor: 'var(--sidebar-bg)',
-                        animation: 'fadeIn 0.2s ease-out'
-                      }}
-                    >
-                      {item.name}
-                      <div 
-                        className="absolute left-0 top-1/2 w-2 h-2 rotate-45"
-                        style={{
-                          backgroundColor: 'var(--sidebar-bg)',
-                          transform: 'translate(-50%, -50%)'
-                        }}
-                      />
-                    </div>
-                  )}
-                </>
-              )}
-            </NavLink>
-          );
-        })}
-      </nav>
-
-      {/* Bottom gradient decoration */}
-      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-blue-600/5 to-transparent pointer-events-none" />
-
-      <style>{`
-        @keyframes fadeIn {
-          from {
-            opacity: 0;
-            transform: translateX(-10px);
-          }
-          to {
-            opacity: 1;
-            transform: translateX(0);
-          }
-        }
-      `}</style>
-    </aside>
+        {/* Footer / User Profile */}
+        <div className={`p-4 border-t ${isDarkMode ? 'border-white/5' : 'border-slate-200'}`}>
+          <div className={`
+            flex items-center ${isCollapsed ? 'justify-center' : 'gap-3'} p-3 rounded-xl
+            transition-all duration-200
+            ${isDarkMode ? 'bg-white/5 hover:bg-white/10' : 'bg-slate-50 hover:bg-slate-100'}
+          `}>
+            <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold shadow-md shrink-0">
+              JD
+            </div>
+            {!isCollapsed && (
+              <div className="flex-1 min-w-0 animate-in fade-in duration-200">
+                <p className={`text-sm font-bold truncate ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>John Doe</p>
+                <p className={`text-xs truncate ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>admin@crm.com</p>
+              </div>
+            )}
+            {!isCollapsed && (
+              <button className={`p-1.5 rounded-lg transition-colors hover:bg-red-500/10 hover:text-red-500 ${theme.text}`}>
+                <LogOut size={18} />
+              </button>
+            )}
+          </div>
+        </div>
+      </aside>
+    </>
   );
-}
+};
+
+export default Sidebar;

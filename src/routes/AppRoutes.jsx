@@ -10,11 +10,10 @@ export default function AppRoutes() {
     <Routes>
       <Route path="/login" element={<Login />} />
 
-      <Route element={<DashboardLayout />}>
-        <Route path="/" element={<Dashboard />} />
-        <Route path="/staff" element={<StaffList />} />
-        <Route path="/insurance" element={<InsuranceList />} />
-      </Route>
+      {/* Pages render their own layout (each page wraps with `DashboardLayout`) */}
+      <Route path="/" element={<Dashboard />} />
+      <Route path="/staff" element={<StaffList />} />
+      <Route path="/insurance" element={<InsuranceList />} />
     </Routes>
   );
 }

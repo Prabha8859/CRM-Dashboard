@@ -1,21 +1,26 @@
-import Card from "../../ui/Card";
+import React, { useState } from 'react';
+import DashboardLayout from '../../components/Layout/DashboardLayout';
+// import Settings from '../../components/Settings.jsx';
+import DashboardHome from '../../components/dasboard/DashboardHome';
+// import Customers from '../../components/dasboard/Customers';
+
 
 export default function Dashboard() {
-  return (
-    <div className="space-y-6">
-      <div className="grid grid-cols-4 gap-6">
-        <Card title="Total Users" value="120" />
-        <Card title="Staff" value="15" />
-        <Card title="Packages" value="8" />
-        <Card title="Tests" value="32" />
-      </div>
+  const [isDarkMode, setIsDarkMode] = useState(true);
+  const [currentPage, setCurrentPage] = useState('Dashboard');
 
-      <div className="bg-white p-6 rounded-xl shadow-sm">
-        <h2 className="font-semibold mb-2">Recent Activity</h2>
-        <p className="text-sm text-slate-500">
-          Yaha future me table / chart aayega
-        </p>
-      </div>
-    </div>
+  const toggleTheme = () => setIsDarkMode(!isDarkMode);
+
+  return (
+    <DashboardLayout
+      isDarkMode={isDarkMode}
+      toggleTheme={toggleTheme}
+      currentPage={currentPage}
+      onNavigate={setCurrentPage}
+    >
+      {currentPage === 'Dashboard' ? (
+        <DashboardHome isDarkMode={isDarkMode} />
+      ) : null}
+    </DashboardLayout>
   );
 }
