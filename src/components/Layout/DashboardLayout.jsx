@@ -1,16 +1,13 @@
 import React, { useState } from "react";
+import { Outlet } from "react-router-dom";
 import Sidebar from "./Sidebar";
 import Navbar from "./Navbar";
 
-const DashboardLayout = ({
-  isDarkMode,
-  toggleTheme,
-  currentPage,
-  onNavigate,
-  children
-}) => {
+const DashboardLayout = () => {
+  const [isDarkMode, setIsDarkMode] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
+  const toggleTheme = () => setIsDarkMode((prev) => !prev);
   const toggleSidebar = () => setIsSidebarOpen(prev => !prev);
 
   const bg = isDarkMode
@@ -24,8 +21,6 @@ const DashboardLayout = ({
         isDarkMode={isDarkMode}
         isOpen={isSidebarOpen}
         toggleSidebar={toggleSidebar}
-        currentPage={currentPage}
-        onNavigate={onNavigate}
       />
 
       {/* RIGHT SIDE */}
@@ -37,7 +32,7 @@ const DashboardLayout = ({
         />
 
         <main className="flex-1 overflow-y-auto px-6 md:px-4 lg:px-8 p">
-          {children}
+          <Outlet context={{ isDarkMode, toggleTheme }} />
         </main>
       </div>
     </div>

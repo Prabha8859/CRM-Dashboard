@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
-import { LayoutDashboard, Users, Settings, PieChart, LogOut, X, Box, ChevronLeft, ChevronRight, User } from 'lucide-react';
+import { NavLink, useNavigate } from 'react-router-dom';
+import { LayoutDashboard, Users, Settings, PieChart, LogOut, X, Box, ChevronLeft, ChevronRight, User, Bell } from 'lucide-react';
+import LogoutModal from './Modals/LogoutModal';
 
-const Sidebar = ({ isDarkMode, isOpen, toggleSidebar, currentPage, onNavigate }) => {
+const Sidebar = ({ isDarkMode, isOpen, toggleSidebar }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   // Enhanced Theme Configuration
   const theme = {
@@ -20,11 +22,24 @@ const Sidebar = ({ isDarkMode, isOpen, toggleSidebar, currentPage, onNavigate })
   };
 
   const menuItems = [
-    { icon: LayoutDashboard, label: 'Dashboard' },
-    { icon: PieChart, label: 'Analytics' },
-    { icon: Users, label: 'Customers' },
-    { icon: Settings, label: 'Settings' },
+    { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
+    { icon: PieChart, label: 'Analytics', path: '/analytics' },
+    { icon: Bell, label: 'Notifications', path: '/notifications' },
+    { icon: Users, label: 'Customers', path: '/staff' },
+    { icon: Settings, label: 'Settings', path: '/settings' },
   ];
+
+  const navigate = useNavigate();
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
+
+  const handleLogout = () => {
+    setIsLogoutModalOpen(true);
+  };
+
+  const confirmLogout = () => {
+    setIsLogoutModalOpen(false);
+    navigate('/login');
+  };
 
   const toggleCollapse = () => setIsCollapsed(!isCollapsed);
 
@@ -92,51 +107,49 @@ const Sidebar = ({ isDarkMode, isOpen, toggleSidebar, currentPage, onNavigate })
               Main Menu
             </p>
           )}
-          {menuItems.map((item, index) => {
-            const isActive = currentPage === item.label;
-            return (
-              <button
+          {menuItems.map((item, index) => (
+            <NavLink
                 key={index}
-                onClick={() => onNavigate && onNavigate(item.label)}
-                className={`
+                to={item.path}
+                className={({ isActive }) => `
                   w-full flex items-center ${isCollapsed ? 'justify-center px-2' : 'gap-3 px-4'} py-3.5 rounded-xl 
                   transition-all duration-200 group relative overflow-hidden
                   ${isActive ? theme.active : `${theme.text} ${theme.hover}`}
                 `}
               >
-                <item.icon 
-                  size={22} 
-                  className={`
-                    transition-colors duration-200
-                    ${isActive ? theme.iconActive : theme.iconInactive}
-                  `} 
-                />
-                {!isCollapsed && <span className="font-medium relative z-10 animate-in fade-in duration-200">{item.label}</span>}
-                
-                {/* Active Indicator for non-active hover state */}
-                {!isActive && (
-                  <div className={`
-                    absolute left-0 top-0 bottom-0 w-1 bg-blue-500 rounded-r-full 
-                    opacity-0 group-hover:opacity-100 transition-opacity duration-200
-                  `} />
-                )}
+                {({ isActive }) => (
+                  <>
+                    <item.icon 
+                      size={22} 
+                      className={`
+                        transition-colors duration-200
+                        ${isActive ? theme.iconActive : theme.iconInactive}
+                      `} 
+                    />
+                    {!isCollapsed && <span className="font-medium relative z-10 animate-in fade-in duration-200">{item.label}</span>}
+                    
+                    {!isActive && (
+                      <div className={`
+                        absolute left-0 top-0 bottom-0 w-1 bg-blue-500 rounded-r-full 
+                        opacity-0 group-hover:opacity-100 transition-opacity duration-200
+                      `} />
+                    )}
 
-                {/* Tooltip for collapsed state */}
-                {isCollapsed && (
-                  <div className={`
-                    absolute left-full ml-4 px-3 py-1.5 rounded-lg text-sm font-medium shadow-xl
-                    opacity-0 group-hover:opacity-100 transition-all duration-200 translate-x-2 group-hover:translate-x-0
-                    pointer-events-none z-50 whitespace-nowrap border
-                    ${theme.tooltip}
-                  `}>
-                    {item.label}
-                    {/* Arrow */}
-                    <div className={`absolute top-1/2 -left-1 w-2 h-2 -mt-1 rotate-45 border-l border-b ${theme.tooltip} border-r-0 border-t-0 bg-inherit`}></div>
-                  </div>
+                    {isCollapsed && (
+                      <div className={`
+                        absolute left-full ml-4 px-3 py-1.5 rounded-lg text-sm font-medium shadow-xl
+                        opacity-0 group-hover:opacity-100 transition-all duration-200 translate-x-2 group-hover:translate-x-0
+                        pointer-events-none z-50 whitespace-nowrap border
+                        ${theme.tooltip}
+                      `}>
+                        {item.label}
+                        <div className={`absolute top-1/2 -left-1 w-2 h-2 -mt-1 rotate-45 border-l border-b ${theme.tooltip} border-r-0 border-t-0 bg-inherit`}></div>
+                      </div>
+                    )}
+                  </>
                 )}
-              </button>
-            );
-          })}
+            </NavLink>
+          ))}
         </div>
 
         {/* Footer / User Profile */}
@@ -156,13 +169,19 @@ const Sidebar = ({ isDarkMode, isOpen, toggleSidebar, currentPage, onNavigate })
               </div>
             )}
             {!isCollapsed && (
-              <button className={`p-1.5 rounded-lg transition-colors hover:bg-red-500/10 hover:text-red-500 ${theme.text}`}>
+              <button onClick={handleLogout} className={`p-1.5 rounded-lg transition-colors hover:bg-red-500/10 hover:text-red-500 ${theme.text}`}>
                 <LogOut size={18} />
               </button>
             )}
           </div>
         </div>
       </aside>
+      <LogoutModal 
+        isOpen={isLogoutModalOpen} 
+        onClose={() => setIsLogoutModalOpen(false)} 
+        onConfirm={confirmLogout}
+        isDarkMode={isDarkMode}
+      />
     </>
   );
 };

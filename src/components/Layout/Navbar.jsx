@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Bell, Search, Menu, User, Settings, LogOut, ChevronDown } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import ThemeToggle from './ThemeToggle';
+import LogoutModal from './Modals/LogoutModal';
 
 const Navbar = ({ isDarkMode, toggleTheme, toggleSidebar }) => {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
@@ -20,8 +21,16 @@ const Navbar = ({ isDarkMode, toggleTheme, toggleSidebar }) => {
     { id: 3, text: "System update scheduled", time: "4 hours ago", unread: false },
   ];
 
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
+
   const handleLogout = (e) => {
     e.preventDefault();
+    setIsProfileOpen(false);
+    setIsLogoutModalOpen(true);
+  };
+
+  const confirmLogout = () => {
+    setIsLogoutModalOpen(false);
     navigate('/login');
   };
 
@@ -32,7 +41,7 @@ const Navbar = ({ isDarkMode, toggleTheme, toggleSidebar }) => {
           <Menu size={24} />
         </button>
         <div>
-          <h1 className={`text-xl md:text-2xl font-bold ${textColor} tracking-tight`}>Analytics Dashboard</h1>
+          <h1 className={`text-xl md:text-2xl font-bold ${textColor} tracking-tight`}> Dashboard</h1>
           <p className={`text-xs md:text-sm ${subTextColor} hidden sm:block font-medium`}>Real-time business metrics and insights</p>
         </div>
       </div>
@@ -74,6 +83,11 @@ const Navbar = ({ isDarkMode, toggleTheme, toggleSidebar }) => {
                     </div>
                   </div>
                 ))}
+                <div className={`px-4 py-3 border-t ${isDarkMode ? 'border-white/10' : 'border-gray-100'} mt-2`}>
+                  <Link to="/notifications" onClick={() => setIsNotificationsOpen(false)} className={`block text-center text-sm font-medium text-blue-500 hover:text-blue-600`}>
+                    View all notifications
+                  </Link>
+                </div>
               </div>
             </>
           )}
@@ -101,7 +115,7 @@ const Navbar = ({ isDarkMode, toggleTheme, toggleSidebar }) => {
                   <p className={`text-xs ${subTextColor}`}>admin@crm.com</p>
                 </div>
                 
-                <button className={`w-full flex items-center gap-3 px-4 py-2.5 text-sm ${subTextColor} hover:${isDarkMode ? 'bg-white/10 text-white' : 'bg-gray-50 text-gray-900'} transition-colors`}>
+                <button onClick={() => navigate('/profile')} className={`w-full flex items-center gap-3 px-4 py-2.5 text-sm ${subTextColor} hover:${isDarkMode ? 'bg-white/10 text-white' : 'bg-gray-50 text-gray-900'} transition-colors`}>
                   <User size={16} /> Profile
                 </button>
                 <button className={`w-full flex items-center gap-3 px-4 py-2.5 text-sm ${subTextColor} hover:${isDarkMode ? 'bg-white/10 text-white' : 'bg-gray-50 text-gray-900'} transition-colors`}>
@@ -116,6 +130,12 @@ const Navbar = ({ isDarkMode, toggleTheme, toggleSidebar }) => {
           )}
         </div>
       </div>
+      <LogoutModal 
+        isOpen={isLogoutModalOpen} 
+        onClose={() => setIsLogoutModalOpen(false)} 
+        onConfirm={confirmLogout}
+        isDarkMode={isDarkMode}
+      />
     </div>
   );
 };
