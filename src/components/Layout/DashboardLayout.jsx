@@ -6,6 +6,8 @@ import Navbar from "./Navbar";
 const DashboardLayout = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  // Default role for demo purposes. In a real app, this comes from your auth context/API
+  const [userRole, setUserRole] = useState(() => localStorage.getItem('userRole') || 'Super Admin');
 
   const toggleTheme = () => setIsDarkMode((prev) => !prev);
   const toggleSidebar = () => setIsSidebarOpen(prev => !prev);
@@ -21,6 +23,8 @@ const DashboardLayout = () => {
         isDarkMode={isDarkMode}
         isOpen={isSidebarOpen}
         toggleSidebar={toggleSidebar}
+        userRole={userRole}
+        setUserRole={setUserRole}
       />
 
       {/* RIGHT SIDE */}
@@ -29,10 +33,11 @@ const DashboardLayout = () => {
           isDarkMode={isDarkMode}
           toggleTheme={toggleTheme}
           toggleSidebar={toggleSidebar}
+          userRole={userRole}
         />
 
-        <main className="flex-1 overflow-y-auto px-6 md:px-4 lg:px-8 p">
-          <Outlet context={{ isDarkMode, toggleTheme }} />
+        <main className="flex-1 overflow-y-auto px-6 md:px-4 lg:px-8 p-6">
+          <Outlet context={{ isDarkMode, toggleTheme, userRole }} />
         </main>
       </div>
     </div>

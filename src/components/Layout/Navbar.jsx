@@ -1,13 +1,14 @@
-import React, { useState } from 'react';
-import { Bell, Search, Menu, User, Settings, LogOut, ChevronDown } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Bell, Search, Menu, User, Settings, LogOut, ChevronDown, Clock } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
 import ThemeToggle from './ThemeToggle';
 import LogoutModal from './Modals/LogoutModal';
 
-const Navbar = ({ isDarkMode, toggleTheme, toggleSidebar }) => {
+const Navbar = ({ isDarkMode, toggleTheme, toggleSidebar, userRole }) => {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const navigate = useNavigate();
+  const [currentTime, setCurrentTime] = useState(new Date());
 
   const textColor = isDarkMode ? "text-white" : "text-gray-900";
   const subTextColor = isDarkMode ? "text-purple-200" : "text-gray-500";
@@ -34,6 +35,24 @@ const Navbar = ({ isDarkMode, toggleTheme, toggleSidebar }) => {
     navigate('/login');
   };
 
+  useEffect(() => {
+    const timer = setInterval(() => setCurrentTime(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  // Dynamic User Details based on Role
+  const getUserDetails = (role) => {
+    switch(role) {
+      case 'Super Admin': return { name: 'Super Admin', email: 'super.admin@crm.com', initials: 'SA' };
+      case 'Admin': return { name: 'Admin User', email: 'admin@crm.com', initials: 'AD' };
+      case 'Staff': return { name: 'Staff Member', email: 'staff@crm.com', initials: 'SM' };
+      case 'Team': return { name: 'Team Lead', email: 'team.lead@crm.com', initials: 'TL' };
+      default: return { name: 'John Doe', email: 'user@crm.com', initials: 'JD' };
+    }
+  };
+
+  const currentUser = getUserDetails(userRole);
+
   return (
     <div className={`sticky top-0 z-30 flex justify-between items-center px-6 md:px-8 py-4 border-b backdrop-blur-xl transition-all duration-300 ${borderColor} ${isDarkMode ? 'bg-indigo-950/80' : 'bg-white/80'}`}>
       <div className="flex items-center gap-4">
@@ -47,6 +66,12 @@ const Navbar = ({ isDarkMode, toggleTheme, toggleSidebar }) => {
       </div>
       
       <div className="flex items-center gap-3">
+        {/* Real-time Clock */}
+        <div className={`hidden lg:flex items-center gap-2 px-4 py-2.5 rounded-full ${isDarkMode ? 'bg-slate-800/50 border-slate-700 text-purple-200' : 'bg-slate-100/50 border-slate-200 text-slate-600'} border transition-all`}>
+          <Clock size={16} />
+          <span className="text-sm font-medium font-mono">{currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+        </div>
+
         {/* Search Bar */}
         <div className={`hidden md:flex items-center px-4 py-2.5 rounded-full ${isDarkMode ? 'bg-slate-800/50 border-slate-700' : 'bg-slate-100/50 border-slate-200'} border transition-all focus-within:ring-2 focus-within:ring-purple-500/50 w-64`}>
             <Search size={18} className={isDarkMode ? "text-slate-400" : "text-slate-500"} />
@@ -101,7 +126,7 @@ const Navbar = ({ isDarkMode, toggleTheme, toggleSidebar }) => {
             className={`flex items-center gap-2 focus:outline-none p-1 pr-2 rounded-full transition-colors ${isDarkMode ? 'hover:bg-white/10' : 'hover:bg-slate-100'}`}
           >
             <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold text-sm shadow-lg ring-2 ring-white/20">
-                JD
+                {currentUser.initials}
             </div>
             <ChevronDown size={16} className={`${subTextColor} hidden md:block`} />
           </button>
@@ -111,8 +136,8 @@ const Navbar = ({ isDarkMode, toggleTheme, toggleSidebar }) => {
               <div className="fixed inset-0 z-30" onClick={() => setIsProfileOpen(false)} />
               <div className={`absolute right-0 mt-3 w-56 rounded-2xl shadow-2xl py-2 z-40 border ${dropdownBg} backdrop-blur-xl animate-in fade-in slide-in-from-top-2 duration-200`}>
                 <div className={`px-4 py-3 border-b ${isDarkMode ? 'border-white/10' : 'border-gray-100'} mb-2`}>
-                  <p className={`text-sm font-bold ${textColor}`}>John Doe</p>
-                  <p className={`text-xs ${subTextColor}`}>admin@crm.com</p>
+                  <p className={`text-sm font-bold ${textColor}`}>{currentUser.name}</p>
+                  <p className={`text-xs ${subTextColor}`}>{currentUser.email}</p>
                 </div>
                 
                 <button onClick={() => navigate('/profile')} className={`w-full flex items-center gap-3 px-4 py-2.5 text-sm ${subTextColor} hover:${isDarkMode ? 'bg-white/10 text-white' : 'bg-gray-50 text-gray-900'} transition-colors`}>
