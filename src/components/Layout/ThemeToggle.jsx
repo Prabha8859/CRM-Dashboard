@@ -7,8 +7,8 @@ const ThemeToggle = ({ isDarkMode, toggleTheme }) => {
       onClick={toggleTheme}
       className={`p-2.5 rounded-full transition-all duration-300 shadow-sm ${
         isDarkMode
-          ? 'bg-slate-800 text-yellow-400 hover:bg-slate-700 hover:shadow-yellow-400/20'
-          : 'bg-white text-orange-500 hover:bg-orange-50 border border-slate-200'
+          ? 'bg-[#45828b] text-[#1bd488] hover:bg-[#055b65] hover:shadow-lg hover:shadow-[#1bd488]/20'
+          : 'bg-[#fbfcfc] text-[#45828b] hover:bg-[#e0e5e9] border border-[#e0e5e9]'
       }`}
     >
       {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}

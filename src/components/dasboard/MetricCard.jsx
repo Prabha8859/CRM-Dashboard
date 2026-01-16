@@ -1,94 +1,61 @@
 import React from 'react';
-import { TrendingUp, TrendingDown } from 'lucide-react';
+import { ArrowUpRight } from 'lucide-react';
+import Card from '../../ui/Card';
 
-const MetricCard = ({ title, value, subtitle, progress, trend, icon: Icon, isDarkMode }) => {
+const MetricCard = ({ title, value, trend, subtitle, isDarkMode, icon: Icon }) => {
+  const isPositive = trend > 0;
+  const isNegative = trend < 0;
+
   return (
-    <div className={`relative p-5 rounded-3xl shadow-2xl transition-all duration-500 cursor-pointer overflow-hidden group
-      ${isDarkMode ? 'bg-gradient-to-br from-purple-600 via-purple-700 to-purple-900' : 'bg-gradient-to-br from-white to-gray-50 border-2 border-purple-100'}`}
-      style={{ transform: 'translateZ(0)' }}>
-      
-      {/* Animated Glow Effect */}
-      <div className="absolute inset-0 bg-gradient-to-r from-pink-500/30 via-blue-500/30 to-purple-500/30 opacity-0 group-hover:opacity-100 blur-xl transition-all duration-700" />
-      
-      {/* Floating Particles */}
-      <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-pink-400/20 to-transparent rounded-full blur-3xl group-hover:scale-150 transition-transform duration-1000" />
-      
-      {/* Large Floating Icon */}
-      <div className="absolute -top-2 -right-2 opacity-10 group-hover:opacity-20 group-hover:scale-110 transition-all duration-500">
-        {Icon && <Icon size={96} className={isDarkMode ? 'text-white' : 'text-purple-600'} />}
+    <Card isDarkMode={isDarkMode}>
+      {/* Arrow Icon */}
+      <div className="absolute top-6 right-6 opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300">
+        <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+          isDarkMode ? 'bg-slate-700' : 'bg-slate-100'
+        }`}>
+          <ArrowUpRight size={16} className={`transition-transform group-hover:rotate-45 ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`} />
+        </div>
       </div>
-      
-      <div className="relative z-10">
-        {/* Header with Icon */}
-        <div className="flex items-center gap-3 mb-4">
-          <div className={`p-2.5 rounded-2xl backdrop-blur-sm transition-all duration-300 group-hover:scale-110 group-hover:rotate-6
-            ${isDarkMode ? 'bg-white/10' : 'bg-purple-100'}`}>
-            {Icon && <Icon size={20} className={isDarkMode ? 'text-purple-200' : 'text-purple-600'} />}
-          </div>
-          <div>
-            <p className={`text-sm font-semibold tracking-wide ${isDarkMode ? 'text-purple-200' : 'text-gray-600'}`}>
-              {title}
-            </p>
-          </div>
-        </div>
-        
-        {/* Main Value */}
-        <h3 className={`text-4xl font-black mb-3 tracking-tight group-hover:scale-105 transition-transform duration-300
-          ${isDarkMode ? 'text-white drop-shadow-lg' : 'text-gray-900'}`}>
-          {value}
-        </h3>
-        
-        {/* Bottom Section */}
-        <div className="flex items-center justify-between">
-          {subtitle && (
-            <span className={`text-xs font-medium uppercase tracking-wider ${isDarkMode ? 'text-purple-300' : 'text-gray-500'}`}>
-              {subtitle}
-            </span>
-          )}
-          
-          {progress && (
-            <div className="relative w-16 h-16">
-              <svg className="w-full h-full transform -rotate-90">
-                <circle cx="32" cy="32" r="28" fill="none" 
-                  stroke={isDarkMode ? '#A78BFA' : '#E5E7EB'} 
-                  strokeWidth="4" opacity="0.2"/>
-                <circle cx="32" cy="32" r="28" fill="none" 
-                  stroke={isDarkMode ? '#fff' : '#8B5CF6'} 
-                  strokeWidth="4"
-                  strokeDasharray={`${progress * 1.76} 176`}
-                  strokeLinecap="round"
-                  className="transition-all duration-1000 drop-shadow-lg">
-                  <animate attributeName="stroke-dasharray" 
-                    from="0 176" 
-                    to={`${progress * 1.76} 176`} 
-                    dur="1.5s" 
-                    fill="freeze"/>
-                </circle>
-              </svg>
-              <div className="absolute inset-0 flex items-center justify-center">
-                <span className={`text-sm font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                  {progress}%
-                </span>
-              </div>
-            </div>
-          )}
-        </div>
-        
-        {/* Trend Indicator */}
-        {trend && (
-          <div className={`flex items-center gap-2 mt-4 px-3 py-2 rounded-full w-fit
-            ${trend > 0 ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
-            {trend > 0 ? <TrendingUp size={18} /> : <TrendingDown size={18} />}
-            <span className="text-sm font-bold">{Math.abs(trend)}% vs last month</span>
+
+      <div className="flex items-center gap-3 mb-3">
+        {Icon && (
+          <div className={`p-2 rounded-lg ${isDarkMode ? 'bg-slate-700' : 'bg-slate-100'}`}>
+            <Icon size={18} className={isDarkMode ? 'text-slate-300' : 'text-slate-500'} />
           </div>
         )}
+        <p className={`text-sm font-medium ${
+          isDarkMode ? 'text-slate-400' : 'text-slate-600'
+        }`}>{title}</p>
       </div>
-      
-      {/* Shimmer Effect */}
-      <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700">
-        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent skew-x-12 animate-shimmer" />
-      </div>
-    </div>
+
+
+      {/* Value */}
+      <h2 className={`text-4xl font-bold mb-4 ${
+        isDarkMode ? 'text-white' : 'text-slate-900'
+      }`}>
+        {value}
+        {!String(value).includes('.') && !String(value).endsWith('%') && 
+          <span className={`text-2xl ${isDarkMode ? 'text-slate-600' : 'text-slate-400'}`}>.00</span>}
+      </h2>
+
+      {/* Trend */}
+      {trend !== undefined && (
+        <div className="flex items-center gap-2">
+          <span className={`text-sm font-semibold px-2 py-0.5 rounded ${
+            isPositive 
+              ? isDarkMode ? 'text-green-400 bg-green-400/10' : 'text-green-600 bg-green-50'
+              : isNegative 
+              ? isDarkMode ? 'text-red-400 bg-red-400/10' : 'text-red-600 bg-red-50'
+              : isDarkMode ? 'text-sky-400 bg-sky-400/10' : 'text-sky-600 bg-sky-50'
+          }`}>
+            {isPositive ? '↑' : isNegative ? '↓' : '–'} {Math.abs(trend)}%
+          </span>
+          <span className={`text-sm ${isDarkMode ? 'text-slate-500' : 'text-slate-400'}`}>
+            {subtitle || 'vs last month'}
+          </span>
+        </div>
+      )}
+    </Card>
   );
 };
 

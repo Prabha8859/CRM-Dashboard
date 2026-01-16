@@ -1,8 +1,15 @@
-export default function Card({ title, value }) {
+import React from 'react';
+
+const Card = ({ children, isDarkMode, className = '', interactive = true }) => {
   return (
-    <div className="bg-white p-6 rounded-xl shadow-sm">
-      <p className="text-sm text-slate-500">{title}</p>
-      <h2 className="text-2xl font-bold text-slate-700">{value}</h2>
+    <div className={`relative rounded-3xl p-6 transition-all duration-300 group ${interactive ? 'hover:scale-[1.02] cursor-pointer hover:shadow-lg' : ''} ${
+      isDarkMode 
+        ? `bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 ${interactive ? 'hover:border-slate-700 hover:shadow-slate-900/50' : ''}`
+        : `bg-white border border-slate-200 ${interactive ? 'hover:border-slate-300' : ''}`
+    } ${className}`}>
+      {children}
     </div>
   );
-}
+};
+
+export default Card;

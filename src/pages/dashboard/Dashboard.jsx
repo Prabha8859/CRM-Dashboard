@@ -4,9 +4,9 @@ import DashboardHome from '../../components/dasboard/DashboardHome';
 
 
 export default function Dashboard() {
-  const { isDarkMode } = useOutletContext();
+  const { isDarkMode, userRole } = useOutletContext();
   
   return (
-    <DashboardHome isDarkMode={isDarkMode} />
+    <DashboardHome isDarkMode={isDarkMode} userRole={userRole} />
   );
 }

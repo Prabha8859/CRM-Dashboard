@@ -1,98 +1,143 @@
 import React, { useState } from 'react';
-import { Users, DollarSign, TrendingUp, Award, Calendar } from 'lucide-react';
+import { Users, DollarSign, TrendingUp, Award, Briefcase, CheckCircle, Star, Shield, Activity, Calendar, UserCheck, UserX, Layers, FileText } from 'lucide-react';
 import MetricCard from './MetricCard';
-import SystemSummary from './SystemSummary';
-// import QuickActions from './QuickActions';
+import MetricCardSkeleton from './MetricCardSkeleton';
+import QuickActions from './QuickActions';
 import TrafficChart from './TrafficChart';
 import LineChart from './LineChart';
 import BarChart from './BarChart';
 import RadarChart from './RadarChart';
+import { useDashboardData } from '../../pages/dashboard/useDashboardData';
+import DashboardHeader from '../../ui/Header/DashboardHeader';
+import Card from '../../ui/Card';
 
-const DashboardHome = ({ isDarkMode }) => {
+// Helper component to render lists/tables
+const DataSection = ({ title, data, isDarkMode }) => {
+  if (!data || data.length === 0) return null;
+
+  // Get headers from the first object keys
+  const headers = Object.keys(data[0]);
+
+  return (
+    <Card isDarkMode={isDarkMode} className="h-full">
+      <h3 className={`text-lg font-bold mb-4 capitalize ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
+        {title.replace(/([A-Z])/g, ' $1').trim()}
+      </h3>
+      <div className="overflow-x-auto">
+        <table className="w-full text-sm text-left">
+          <thead className={`text-xs uppercase font-semibold ${isDarkMode ? 'text-slate-400 bg-slate-800/50' : 'text-slate-500 bg-slate-50'}`}>
+            <tr>
+              {headers.map((header) => (
+                <th key={header} className="px-4 py-3">{header.replace(/([A-Z])/g, ' $1').trim()}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody className={`divide-y ${isDarkMode ? 'divide-slate-700' : 'divide-slate-100'}`}>
+            {data.map((row, idx) => (
+              <tr key={idx} className={`transition-colors ${isDarkMode ? 'hover:bg-slate-800/30' : 'hover:bg-slate-50'}`}>
+                {headers.map((header) => (
+                  <td key={header} className={`px-4 py-3 ${isDarkMode ? 'text-slate-300' : 'text-slate-700'}`}>
+                    {row[header]}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </Card>
+  );
+};
+
+const DashboardHome = ({ isDarkMode, userRole }) => {
   const [dateRange, setDateRange] = useState({ start: '', end: '' });
+  const { data, config, loading } = useDashboardData(userRole);
+
+  // Helper to map data keys to icons dynamically
+  const getIcon = (key) => {
+    const iconMap = {
+      totalAdmins: Shield,
+      totalStaff: Users,
+      totalTeams: Layers,
+      totalLeads: Briefcase,
+      activeLeads: Activity,
+      closedLeads: CheckCircle,
+      myStaffCount: Users,
+      myTeamCount: Layers,
+      myTotalLeads: Briefcase,
+      myActiveLeads: Activity,
+      myClosedLeads: CheckCircle,
+      myLeads: Briefcase,
+      newLeads: Star,
+      inProgressLeads: Activity,
+      teamTotalLeads: Briefcase,
+      teamActiveLeads: Activity,
+      teamClosedLeads: CheckCircle,
+      teamMembersCount: Users
+    };
+    return iconMap[key] || Users;
+  };
 
   return (
     <div className="space-y-8">
       {/* Header */}
-      <div className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-4">
-        <div>
-          <h1 className={`text-5xl font-black mb-3 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-            Analytics Dashboard
-          </h1>
-          <p className={`text-lg ${isDarkMode ? 'text-purple-300' : 'text-gray-600'}`}>
-            Real-time business metrics and insights • Updated just now
-          </p>
-        </div>
-
-        {/* Date Range Picker */}
-        <div className={`flex items-center gap-3 px-4 py-2 rounded-xl border transition-colors ${isDarkMode ? 'bg-white/5 border-white/10 hover:bg-white/10' : 'bg-white border-gray-200 shadow-sm hover:border-purple-200'}`}>
-          <Calendar size={20} className={isDarkMode ? 'text-purple-300' : 'text-gray-500'} />
-          <input 
-            type="date" 
-            className={`bg-transparent outline-none text-sm font-medium ${isDarkMode ? 'text-white [&::-webkit-calendar-picker-indicator]:invert' : 'text-gray-700'}`}
-            value={dateRange.start}
-            onChange={(e) => setDateRange({...dateRange, start: e.target.value})}
-          />
-          <span className={isDarkMode ? 'text-purple-300' : 'text-gray-400'}>to</span>
-          <input 
-            type="date" 
-            className={`bg-transparent outline-none text-sm font-medium ${isDarkMode ? 'text-white [&::-webkit-calendar-picker-indicator]:invert' : 'text-gray-700'}`}
-            value={dateRange.end}
-            onChange={(e) => setDateRange({...dateRange, end: e.target.value})}
-          />
-        </div>
-      </div>
+      <DashboardHeader 
+        title={config?.title || 'Dashboard'}
+        userRole={userRole}
+        isDarkMode={isDarkMode}
+        dateRange={dateRange}
+        setDateRange={setDateRange}
+      />
 
       {/* Top Metrics Row */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <MetricCard 
-          title="Total Subscribers" 
-          value="2,280" 
-          trend={12}
-          icon={Users}
-          isDarkMode={isDarkMode}
-        />
-        <MetricCard 
-          title="Revenue" 
-          value="$236.8K" 
-          subtitle="Monthly Target" 
-          progress={100}
-          icon={DollarSign}
-          isDarkMode={isDarkMode}
-        />
-        <MetricCard 
-          title="Active Leads" 
-          value="4,529" 
-          trend={8}
-          icon={TrendingUp}
-          isDarkMode={isDarkMode}
-        />
-        <MetricCard 
-          title="Closed Deals" 
-          value="2,898" 
-          subtitle="Conversion Rate" 
-          progress={64}
-          icon={Award}
-          isDarkMode={isDarkMode}
-        />
-      </div>
-
-      {/* System Summary */}
-      <SystemSummary isDarkMode={isDarkMode} />
+      {loading ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6">
+           {[...Array(6)].map((_, i) => (
+            <MetricCardSkeleton key={i} isDarkMode={isDarkMode} />
+          ))}
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6">
+          {config?.stats.map((key) => {
+            const statData = data?.[key];
+            if (!statData) return null;
+            return (
+              <MetricCard 
+                key={key}
+                title={statData.label} 
+                value={statData.value} 
+                trend={statData.trend}
+                icon={getIcon(key)}
+                isDarkMode={isDarkMode}
+              />
+            );
+          })}
+        </div>
+      )}
 
       {/* Quick Actions */}
-      {/* <QuickActions isDarkMode={isDarkMode} /> */}
+      <QuickActions isDarkMode={isDarkMode} actions={config?.actions} />
 
-      {/* Charts Section */}
+      {/* Dynamic Sections (Tables/Lists) */}
+      {!loading && config?.sections && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {config.sections.map((sectionKey) => (
+            <DataSection 
+              key={sectionKey} 
+              title={sectionKey} 
+              data={data?.[sectionKey]} 
+              isDarkMode={isDarkMode} 
+            />
+          ))}
+        </div>
+      )}
+
+      {/* Charts Section - Only show relevant charts based on role */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <LineChart isDarkMode={isDarkMode} dateRange={dateRange} />
-        <TrafficChart isDarkMode={isDarkMode} dateRange={dateRange} />
-      </div>
-
-      {/* Bottom Charts */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <BarChart isDarkMode={isDarkMode} dateRange={dateRange} />
-        <RadarChart isDarkMode={isDarkMode} dateRange={dateRange} />
+        {userRole !== 'Staff' && <LineChart isDarkMode={isDarkMode} dateRange={dateRange} />}
+        {userRole !== 'Staff' && <TrafficChart isDarkMode={isDarkMode} dateRange={dateRange} />}
+        {userRole === 'Super Admin' && <BarChart isDarkMode={isDarkMode} dateRange={dateRange} />}
+        {userRole === 'Super Admin' && <RadarChart isDarkMode={isDarkMode} dateRange={dateRange} />}
       </div>
     </div>
   );

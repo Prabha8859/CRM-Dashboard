@@ -1,14 +1,16 @@
 import { useState } from "react";
+import { useOutletContext } from "react-router-dom";
 import { 
   Plus, Search, Filter, Edit, Trash2, Shield, 
   Download, Upload, Eye, Star, Mail, Phone, TrendingUp, X, Check 
 } from "lucide-react";
-import PageHeader from "../../components/PageHeader";
+import DashboardHeader from '../../ui/Header/DashboardHeader';
 import ConfirmDialog from "../../components/ConfirmDialog";
-import Button from "../../ui/Button";
+// import Button from "../../ui/Button";
 import Badge from "../../ui/badge";
 
 export default function StaffList() {
+  const { isDarkMode, userRole } = useOutletContext();
   const [searchTerm, setSearchTerm] = useState("");
   const [roleFilter, setRoleFilter] = useState("All");
   const [statusFilter, setStatusFilter] = useState("All");
@@ -111,16 +113,24 @@ export default function StaffList() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 p-8">
-      <div className="max-w-7xl mx-auto">
-        {/* Page Header */}
-        <PageHeader 
-          title="Staff Management" 
-          subtitle="Manage your team members and their roles"
-        >
-          <Button variant="ghost" icon={Download}>Export</Button>
-          <Button variant="secondary" icon={Upload}>Import</Button>
-          <Button icon={Plus}>Add Staff</Button>
-        </PageHeader>
+      <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+      <DashboardHeader 
+        title="Staff Management"
+        subtitle="Manage your team members and their roles."
+        userRole={userRole}
+        isDarkMode={isDarkMode}
+      >
+        <button className="px-4 py-2 bg-[#1bd488] hover:bg-[#1bd488]/90 text-[#055b65] rounded-lg text-sm font-bold transition-colors shadow-lg shadow-[#1bd488]/20 flex items-center gap-2">
+          <Plus size={16} />
+          Add Staff
+        </button>
+      </DashboardHeader>
+
+      <div className={`p-8 rounded-2xl border border-dashed ${isDarkMode ? 'border-slate-700 bg-slate-900/50' : 'border-slate-300 bg-slate-50'} flex items-center justify-center`}>
+        <p className={isDarkMode ? 'text-slate-400' : 'text-slate-500'}>
+          Staff list content goes here.
+        </p>
+      </div>
 
         {/* Statistics Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">

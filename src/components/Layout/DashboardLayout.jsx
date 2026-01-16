@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Outlet } from "react-router-dom";
 import Sidebar from "./Sidebar";
 import Navbar from "./Navbar";
@@ -6,15 +6,30 @@ import Navbar from "./Navbar";
 const DashboardLayout = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(false);
   // Default role for demo purposes. In a real app, this comes from your auth context/API
   const [userRole, setUserRole] = useState(() => localStorage.getItem('userRole') || 'Super Admin');
 
   const toggleTheme = () => setIsDarkMode((prev) => !prev);
   const toggleSidebar = () => setIsSidebarOpen(prev => !prev);
 
+  // Auto-collapse on smaller screens
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 1280) {
+        setIsCollapsed(true);
+      } else {
+        setIsCollapsed(false);
+      }
+    };
+    handleResize(); // Initial check
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   const bg = isDarkMode
-    ? "bg-gradient-to-br from-indigo-950 via-purple-900 to-pink-900"
-    : "bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50";
+    ? "bg-[#055b65]"
+    : "bg-[#fbfcfc]";
 
   return (
     <div className={`flex h-screen ${bg}`}>
@@ -25,10 +40,12 @@ const DashboardLayout = () => {
         toggleSidebar={toggleSidebar}
         userRole={userRole}
         setUserRole={setUserRole}
+        isCollapsed={isCollapsed}
+        setIsCollapsed={setIsCollapsed}
       />
 
       {/* RIGHT SIDE */}
-      <div className="flex flex-col flex-1">
+      <div className="flex flex-col flex-1 transition-all duration-500 ease-in-out">
         <Navbar
           isDarkMode={isDarkMode}
           toggleTheme={toggleTheme}
