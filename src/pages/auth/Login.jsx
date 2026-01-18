@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Mail, Lock, ArrowRight, LayoutDashboard, Shield, ChevronDown } from 'lucide-react';
+import { Mail, Lock, ArrowRight, LayoutDashboard } from 'lucide-react';
 
 const Login = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [role, setRole] = useState('Super Admin');
   const [isLoading, setIsLoading] = useState(false);
 
   const handleLogin = (e) => {
@@ -14,7 +13,6 @@ const Login = () => {
     setIsLoading(true);
     // Simulate API call
     setTimeout(() => {
-      localStorage.setItem('userRole', role);
       setIsLoading(false);
       navigate('/');
     }, 1000);
@@ -72,28 +70,6 @@ const Login = () => {
                   placeholder="••••••••"
                   required
                 />
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-[#e0e5e9] ml-1">Select Role</label>
-              <div className="relative group">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <Shield className="h-5 w-5 text-[#b2c9c5] group-focus-within:text-[#1bd488] transition-colors" />
-                </div>
-                <select
-                  value={role}
-                  onChange={(e) => setRole(e.target.value)}
-                  className="w-full pl-11 pr-10 py-3.5 bg-black/20 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-[#1bd488]/50 focus:border-transparent transition-all appearance-none cursor-pointer"
-                >
-                  <option value="Super Admin" className="bg-[#055b65] text-white">Super Admin</option>
-                  <option value="Admin" className="bg-[#055b65] text-white">Admin</option>
-                  <option value="Staff" className="bg-[#055b65] text-white">Staff</option>
-                  <option value="Team" className="bg-[#055b65] text-white">Team</option>
-                </select>
-                <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
-                  <ChevronDown className="h-5 w-5 text-[#b2c9c5]" />
-                </div>
               </div>
             </div>
 

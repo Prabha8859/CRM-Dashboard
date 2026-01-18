@@ -3,7 +3,6 @@ import { Bell, Search, Menu, User, Settings, LogOut, ChevronDown, Clock } from '
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import ThemeToggle from './ThemeToggle';
 import LogoutModal from './Modals/LogoutModal';
-import { getUserDetails } from '../allprofile/utils/userUtils';
 
 const Navbar = ({ isDarkMode, toggleTheme, toggleSidebar, userRole }) => {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
@@ -42,7 +41,11 @@ const Navbar = ({ isDarkMode, toggleTheme, toggleSidebar, userRole }) => {
     return () => clearInterval(timer);
   }, []);
 
-  const currentUser = getUserDetails(userRole);
+  const currentUser = {
+    name: "Admin User",
+    email: "admin@crm.com",
+    initials: userRole ? userRole.substring(0, 2).toUpperCase() : "AD"
+  };
 
   const pathnames = location.pathname.split('/').filter((x) => x);
 
@@ -159,7 +162,10 @@ const Navbar = ({ isDarkMode, toggleTheme, toggleSidebar, userRole }) => {
                 <button onClick={() => navigate('/profile')} className={`w-full flex items-center gap-3 px-4 py-2.5 text-sm ${subTextColor} hover:${isDarkMode ? 'bg-[#45828b]/20 text-white' : 'bg-[#e0e5e9]/60 text-gray-900'} transition-colors`}>
                   <User size={16} /> Profile
                 </button>
-                <button className={`w-full flex items-center gap-3 px-4 py-2.5 text-sm ${subTextColor} hover:${isDarkMode ? 'bg-[#45828b]/20 text-white' : 'bg-[#e0e5e9]/60 text-gray-900'} transition-colors`}>
+                <button onClick={() => {
+                  setIsProfileOpen(false);
+                  navigate('/settings');
+                }} className={`w-full flex items-center gap-3 px-4 py-2.5 text-sm ${subTextColor} hover:${isDarkMode ? 'bg-[#45828b]/20 text-white' : 'bg-[#e0e5e9]/60 text-gray-900'} transition-colors`}>
                   <Settings size={16} /> Settings
                 </button>
                 <div className={`border-t ${isDarkMode ? 'border-white/10' : 'border-gray-100'} my-1`}></div>

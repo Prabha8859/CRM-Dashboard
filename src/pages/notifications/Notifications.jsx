@@ -1,71 +1,94 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
-import { Bell, Check, Archive, Trash2 } from 'lucide-react';
+import { Bell, CheckCircle, AlertTriangle, Info, Clock, Trash2 } from 'lucide-react';
+import DashboardHeader from '../../ui/Header/DashboardHeader';
 
 const Notifications = () => {
-  const { isDarkMode } = useOutletContext();
+  const { isDarkMode, userRole } = useOutletContext();
+  
+  // Mock Notifications Data
+  const [notifications, setNotifications] = useState([
+    { id: 1, type: 'info', title: 'New Staff Added', message: 'Rahul Sharma has joined the Engineering team.', time: '10 mins ago', read: false },
+    { id: 2, type: 'success', title: 'Report Generated', message: 'Weekly revenue report is ready for download.', time: '1 hour ago', read: true },
+    { id: 3, type: 'warning', title: 'System Update', message: 'Scheduled maintenance at 2:00 AM UTC.', time: '4 hours ago', read: true },
+    { id: 4, type: 'alert', title: 'High Usage Alert', message: 'Server CPU usage exceeded 90%.', time: 'Yesterday', read: true },
+  ]);
 
-  const cardClass = isDarkMode ? "bg-slate-900/50 border-slate-700" : "bg-white border-slate-200";
-  const textClass = isDarkMode ? "text-white" : "text-slate-900";
-  const subTextClass = isDarkMode ? "text-slate-400" : "text-slate-500";
+  const getIcon = (type) => {
+    switch(type) {
+      case 'success': return <CheckCircle size={20} className="text-green-500" />;
+      case 'warning': return <AlertTriangle size={20} className="text-amber-500" />;
+      case 'alert': return <Bell size={20} className="text-red-500" />;
+      default: return <Info size={20} className="text-blue-500" />;
+    }
+  };
 
-  const notifications = [
-    { id: 1, text: "New staff member 'Alex Johnson' was added to the team.", time: "5 min ago", unread: true },
-    { id: 2, text: "Your weekly revenue report for 'Q4 2025' is ready for download.", time: "1 hour ago", unread: false },
-    { id: 3, text: "A system-wide update is scheduled for tonight at 11:00 PM PST.", time: "4 hours ago", unread: false },
-    { id: 4, text: "Insurance policy #INS-7890 for 'Client Corp' is about to expire.", time: "1 day ago", unread: true },
-    { id: 5, text: "New login detected from a new device in 'New York, USA'.", time: "2 days ago", unread: false },
-    { id: 6, text: "Task 'Finalize Q1 budget' is overdue by 3 days.", time: "3 days ago", unread: true },
-    { id: 7, text: "You have been mentioned in a comment on the 'Project Phoenix' board.", time: "5 days ago", unread: false },
-  ];
+  const markAllRead = () => {
+    setNotifications(notifications.map(n => ({ ...n, read: true })));
+  };
+  const clearAll = () => {
+    setNotifications([]);
+  };
+
+  const theme = {
+    text: isDarkMode ? 'text-white' : 'text-slate-900',
+    subText: isDarkMode ? 'text-slate-400' : 'text-slate-500',
+    cardBg: isDarkMode ? 'bg-[#022c33] border-[#45828b]/30' : 'bg-white border-slate-200',
+    itemBg: isDarkMode ? 'hover:bg-[#055b65]/30' : 'hover:bg-slate-50',
+    unreadBg: isDarkMode ? 'bg-[#055b65]/20' : 'bg-blue-50/50',
+  };
 
   return (
-    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 p-6">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <div>
-          <h2 className={`text-2xl font-bold ${textClass}`}>Notifications</h2>
-          <p className={`text-sm ${subTextClass}`}>View and manage all your system alerts.</p>
-        </div>
+    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+      <DashboardHeader 
+        title="Notifications" 
+        subtitle="View your system alerts and messages."
+        userRole={userRole}
+        isDarkMode={isDarkMode}
+      >
         <div className="flex gap-2">
-          <button className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${isDarkMode ? 'bg-slate-800 hover:bg-slate-700 text-white' : 'bg-slate-100 hover:bg-slate-200 text-slate-700'}`}>
-            <Check size={16} /> Mark all as read
+          <button onClick={markAllRead} className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${isDarkMode ? 'text-[#1bd488] hover:bg-[#1bd488]/10' : 'text-blue-600 hover:bg-blue-50'}`}>
+            Mark all read
           </button>
-          <button className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${isDarkMode ? 'bg-slate-800 hover:bg-slate-700 text-white' : 'bg-slate-100 hover:bg-slate-200 text-slate-700'}`}>
-            <Archive size={16} /> Archive all
+          <button onClick={clearAll} className="px-4 py-2 text-sm font-medium text-red-500 hover:bg-red-500/10 rounded-lg transition-colors flex items-center gap-2">
+            <Trash2 size={16} /> Clear all
           </button>
         </div>
-      </div>
+      </DashboardHeader>
 
-      <div className={`rounded-2xl border ${cardClass} shadow-sm overflow-hidden`}>
-        <ul className="divide-y divide-slate-200 dark:divide-slate-800">
-          {notifications.map((notif) => (
-            <li key={notif.id} className={`p-4 flex items-start gap-4 transition-colors group ${notif.unread ? (isDarkMode ? 'bg-blue-900/20' : 'bg-blue-50/50') : ''}`}>
-              <div className={`mt-1 p-2 rounded-full ${notif.unread ? 'bg-blue-500/10 text-blue-500' : (isDarkMode ? 'bg-slate-800 text-slate-400' : 'bg-slate-100 text-slate-500')}`}>
-                <Bell size={18} />
+      <div className={`rounded-2xl border overflow-hidden ${theme.cardBg}`}>
+        {notifications.length > 0 ? (
+          <div className="divide-y divide-gray-200/10">
+            {notifications.map((notif) => (
+              <div key={notif.id} className={`p-4 flex gap-4 transition-colors ${theme.itemBg} ${!notif.read ? theme.unreadBg : ''}`}>
+                <div className={`mt-1 p-2 rounded-full ${isDarkMode ? 'bg-black/20' : 'bg-slate-100'}`}>
+                  {getIcon(notif.type)}
+                </div>
+                <div className="flex-1">
+                  <div className="flex justify-between items-start">
+                    <h3 className={`font-semibold ${theme.text}`}>{notif.title}</h3>
+                    <span className={`text-xs flex items-center gap-1 ${theme.subText}`}>
+                      <Clock size={12} /> {notif.time}
+                    </span>
+                  </div>
+                  <p className={`text-sm mt-1 ${theme.subText}`}>{notif.message}</p>
+                </div>
+                {!notif.read && (
+                  <div className="mt-2">
+                    <div className="w-2 h-2 rounded-full bg-blue-500"></div>
+                  </div>
+                )}
               </div>
-              <div className="flex-1">
-                <p className={`text-sm ${textClass}`}>{notif.text}</p>
-                <p className={`text-xs mt-1 ${subTextClass}`}>{notif.time}</p>
-              </div>
-              <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                <button title="Mark as read" className={`p-2 rounded-lg hover:bg-green-500/10 text-green-500 transition-colors`}>
-                  <Check size={16} />
-                </button>
-                <button title="Delete" className={`p-2 rounded-lg hover:bg-red-500/10 text-red-500 transition-colors`}>
-                  <Trash2 size={16} />
-                </button>
-              </div>
-            </li>
-          ))}
-        </ul>
-        <div className={`p-4 border-t ${isDarkMode ? 'border-slate-800' : 'border-slate-200'} text-center`}>
-            <button className={`text-sm font-medium text-blue-500 hover:text-blue-600`}>
-                Load More
-            </button>
-        </div>
+            ))}
+          </div>
+        ) : (
+          <div className="p-12 text-center">
+            <Bell size={48} className={`mx-auto mb-4 ${isDarkMode ? 'text-slate-700' : 'text-slate-300'}`} />
+            <p className={theme.subText}>No notifications to show</p>
+          </div>
+        )}
       </div>
     </div>
   );
 };
-
 export default Notifications;

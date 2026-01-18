@@ -6,6 +6,7 @@ import {
 } from "lucide-react";
 import DashboardHeader from '../../ui/Header/DashboardHeader';
 import ConfirmDialog from "../../components/ConfirmDialog";
+import StaffModal from "../../components/Staff/StaffModal";
 // import Button from "../../ui/Button";
 import Badge from "../../ui/badge";
 
@@ -15,12 +16,14 @@ export default function StaffList() {
   const [roleFilter, setRoleFilter] = useState("All");
   const [statusFilter, setStatusFilter] = useState("All");
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [showStaffModal, setShowStaffModal] = useState(false);
+  const [modalMode, setModalMode] = useState('add'); // 'add' or 'edit'
   const [selectedStaff, setSelectedStaff] = useState(null);
   const [showFilters, setShowFilters] = useState(false);
   const [hoveredRow, setHoveredRow] = useState(null);
 
-  // Mock Data
-  const staffData = [
+  // Mock Data - Converted to State
+  const [staffData, setStaffData] = useState([
     { 
       id: 1, 
       name: "Rahul Sharma", 
@@ -81,7 +84,7 @@ export default function StaffList() {
       rating: 4.5,
       tasks: 22
     },
-  ];
+  ]);
 
   // Statistics
   const stats = {
@@ -106,9 +109,37 @@ export default function StaffList() {
   };
 
   const handleConfirmDelete = () => {
-    console.log("Deleting:", selectedStaff);
+    // In a real app, API call here
+    setStaffData(staffData.map(s => s.id === selectedStaff.id ? { ...s, status: 'Inactive' } : s));
     setShowDeleteDialog(false);
     setSelectedStaff(null);
+  };
+
+  const handleAddClick = () => {
+    setModalMode('add');
+    setSelectedStaff(null);
+    setShowStaffModal(true);
+  };
+
+  const handleEditClick = (staff) => {
+    setModalMode('edit');
+    setSelectedStaff(staff);
+    setShowStaffModal(true);
+  };
+
+  const handleSaveStaff = (formData) => {
+    if (modalMode === 'add') {
+      const newStaff = {
+        id: staffData.length + 1,
+        ...formData,
+        joinDate: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
+        rating: 0,
+        tasks: 0
+      };
+      setStaffData([newStaff, ...staffData]);
+    } else {
+      setStaffData(staffData.map(s => s.id === selectedStaff.id ? { ...s, ...formData } : s));
+    }
   };
 
   return (
@@ -120,17 +151,14 @@ export default function StaffList() {
         userRole={userRole}
         isDarkMode={isDarkMode}
       >
-        <button className="px-4 py-2 bg-[#1bd488] hover:bg-[#1bd488]/90 text-[#055b65] rounded-lg text-sm font-bold transition-colors shadow-lg shadow-[#1bd488]/20 flex items-center gap-2">
+        <button 
+          onClick={handleAddClick}
+          className="px-4 py-2 bg-[#1bd488] hover:bg-[#1bd488]/90 text-[#055b65] rounded-lg text-sm font-bold transition-colors shadow-lg shadow-[#1bd488]/20 flex items-center gap-2"
+        >
           <Plus size={16} />
           Add Staff
         </button>
       </DashboardHeader>
-
-      <div className={`p-8 rounded-2xl border border-dashed ${isDarkMode ? 'border-slate-700 bg-slate-900/50' : 'border-slate-300 bg-slate-50'} flex items-center justify-center`}>
-        <p className={isDarkMode ? 'text-slate-400' : 'text-slate-500'}>
-          Staff list content goes here.
-        </p>
-      </div>
 
         {/* Statistics Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
@@ -352,7 +380,10 @@ export default function StaffList() {
                           <button className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all hover:scale-110">
                             <Eye size={16} />
                           </button>
-                          <button className="p-2 text-slate-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-all hover:scale-110">
+                          <button 
+                            onClick={() => handleEditClick(staff)}
+                            className="p-2 text-slate-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-all hover:scale-110"
+                          >
                             <Edit size={16} />
                           </button>
                           <button 
@@ -389,6 +420,16 @@ export default function StaffList() {
           message={`Are you sure you want to disable ${selectedStaff?.name}? They will no longer be able to access the system.`}
           onConfirm={handleConfirmDelete}
           onCancel={() => setShowDeleteDialog(false)}
+        />
+
+        {/* Add/Edit Staff Modal */}
+        <StaffModal 
+          isOpen={showStaffModal}
+          onClose={() => setShowStaffModal(false)}
+          onSave={handleSaveStaff}
+          staff={selectedStaff}
+          mode={modalMode}
+          isDarkMode={isDarkMode}
         />
       </div>
 
